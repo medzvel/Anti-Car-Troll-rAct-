@@ -1,4 +1,4 @@
-//Anti car troll include by RogueDrifter Jan 15th 2018.
+//Anti car troll include by RogueDrifter Jan 15th 2018
 
 #if defined _AntiCarTroll_included
     #endinput
@@ -8,7 +8,7 @@
 
 #include <a_samp>
 
-new ActTimer[MAX_PLAYERS], bool:VehicleTaken[MAX_VEHICLES], VehicleTempOwner[MAX_VEHICLES], pVehicleID[MAX_PLAYERS], ResetTAct[MAX_PLAYERS], bool:ActAntiSpam[MAX_PLAYERS], bool:AntiJackBug[MAX_PLAYERS];
+new AllVehicles[MAX_VEHICLES], ActTimer[MAX_PLAYERS], bool:VehicleTaken[MAX_VEHICLES], VehicleTempOwner[MAX_VEHICLES], pVehicleID[MAX_PLAYERS], ResetTAct[MAX_PLAYERS], bool:ActAntiSpam[MAX_PLAYERS], bool:AntiJackBug[MAX_PLAYERS], SafeTimer;
 
 #if defined OnPlayerEnterVehicleACT
 forward OnPlayerEnterVehicleACT(playerid, vehicleid, ispassenger);
@@ -50,6 +50,7 @@ public OnFilterScriptInit()
 		print("		[[--|| rACT V1.0 ||--]]		");
 		print("		[[--|| Anti car troll by RogueDrifter V 1.0 ||--]]		");
 		print("		[[--|| Successfully Loaded! ||--]]		");
+		SafeTimer = SetTimer("SafeReset",1000,true);
 			#if defined OnFilterScriptInitACT
 		return OnFilterScriptInitACT();
 		#else
@@ -60,16 +61,18 @@ public OnFilterScriptInit()
 forward OnFilterScriptExitACT();
 public OnFilterScriptExit()
 {
-	for(new i=0;i<GetPlayerPoolSize();i++)
+	for(new i=0;i<MAX_PLAYERS;i++)
 	{
 		KillTimer(ActTimer[i]);
 	}
+	KillTimer(SafeTimer);
 	#if defined OnFilterScriptExitACT
 		return OnFilterScriptExitACT();
 		#else
 		return 1;
   			#endif
 }
+
 #else
 
 forward OnGameModeInitACT();
@@ -78,6 +81,7 @@ public OnGameModeInit()
 		print("		[[--|| rACT V1.0 ||--]]		");
 		print("		[[--|| Anti car troll by RogueDrifter V 1.0 ||--]]		");
 		print("		[[--|| Successfully Loaded! ||--]]		");
+		SafeTimer = SetTimer("SafeReset",10000,true);
 		#if defined OnGameModeInitACT
 		return OnGameModeInitACT();
 		#else
@@ -88,10 +92,11 @@ public OnGameModeInit()
 forward OnGameModeExitACT();
 public OnGameModeExit()
 {
-	for(new i=0;i<GetPlayerPoolSize();i++)
+	for(new i=0;i<MAX_PLAYERS;i++)
 	{
 		KillTimer(ActTimer[i]);
 	}
+	KillTimer(SafeTimer);
 	#if defined OnGameModeExitACT
 		return OnGameModeExitACT();
 		#else
@@ -109,9 +114,34 @@ stock IsPEnExCar(playerid)
  	else return 0;
 }
 
+forward SafeReset();
+public SafeReset()
+{
+    for(new i=0; i<MAX_PLAYERS; i++)
+	{
+    	if(GetPlayerState(i)== PLAYER_STATE_DRIVER && AllVehicles[GetPlayerVehicleID(i)] != i )
+    	{
+			AllVehicles[GetPlayerVehicleID(i)]= i;
+			VehicleTaken[GetPlayerVehicleID(i)]= true;
+    		}
+		}
+	for(new x=0; x<MAX_VEHICLES; x++)
+	{
+		if(AllVehicles[x] != -1)
+		{
+			if(GetPlayerState(AllVehicles[x]) != PLAYER_STATE_DRIVER) AllVehicles[x] = -1;
+			}
+		if(AllVehicles[x] == -1 && VehicleTaken[x])
+		{
+			VehicleTaken[x]= false;
+			}
+		}
+	return 1;
+}
+
 public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 {
-	for(new i=0;i<GetPlayerPoolSize();i++)
+	for(new i=0;i<MAX_PLAYERS;i++)
 	{
 		if(!ispassenger && !AntiJackBug[playerid] && i != playerid && GetPlayerVehicleID(i) == vehicleid && GetPlayerState(i) == PLAYER_STATE_DRIVER)
 		{
