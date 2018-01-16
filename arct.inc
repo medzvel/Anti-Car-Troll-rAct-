@@ -50,7 +50,7 @@ public OnFilterScriptInit()
 		print("		[[--|| rACT V1.0 ||--]]		");
 		print("		[[--|| Anti car troll by RogueDrifter V 1.0 ||--]]		");
 		print("		[[--|| Successfully Loaded! ||--]]		");
-		SafeTimer = SetTimer("SafeReset",1000,true);
+		SafeTimer = SetTimer("SafeReset",5000,true);
 			#if defined OnFilterScriptInitACT
 		return OnFilterScriptInitACT();
 		#else
@@ -81,7 +81,7 @@ public OnGameModeInit()
 		print("		[[--|| rACT V1.0 ||--]]		");
 		print("		[[--|| Anti car troll by RogueDrifter V 1.0 ||--]]		");
 		print("		[[--|| Successfully Loaded! ||--]]		");
-		SafeTimer = SetTimer("SafeReset",10000,true);
+		SafeTimer = SetTimer("SafeReset",5000,true);
 		#if defined OnGameModeInitACT
 		return OnGameModeInitACT();
 		#else
