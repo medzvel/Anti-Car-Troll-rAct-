@@ -1,7 +1,9 @@
 # Anti-Car-Troll-rAct-
+
 What is this:
 First of all its a Anti car troll (rA.c.t) and what it does is it counters most if not all of the car trolling cheats now i can't give you a 100% that this will counter all but it will do its best against them and by car troll i mean people ambushing other drivers, i never saw this concept (my concept) applied anywhere and i actually don't see any anti car troll scripts around so here it is.
 =====
+
 Included Features:
 I made this VERY user friendly, 3 defines:
 Code:
@@ -14,6 +16,7 @@ Code:
 //#define ManualUse  
 You can use any of those but i recommend leaving all default YOU CANT USE (UNCOMMENT) MORE THAN ONE! the order is that extreme_safe will take over ban version and manual use will take over both. And its a kick by default.
 ======
+
 Usage:
 Very very simple, download the include from the link i will provide and do #include <name of the file> then compile, if you uncomment the safe mode or the ban version you dont have to add anything BUT if you uncomment the Manual Use you will have to use the function OnPlayerCarTroll(playerid,vehicleid) and do whatever you want to the player.
   
