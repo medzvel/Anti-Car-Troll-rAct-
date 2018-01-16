@@ -1,4 +1,4 @@
-//Anti car troll include by RogueDrifter Jan 15th 2018
+//Anti car troll include by RogueDrifter Jan 15th 2018.
 
 #if defined _AntiCarTroll_included
     #endinput
