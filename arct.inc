@@ -9,6 +9,11 @@
 
 new ActTimer[MAX_PLAYERS], bool:VehicleTaken[MAX_VEHICLES], VehicleTempOwner[MAX_VEHICLES], pVehicleID[MAX_PLAYERS], ResetTAct[MAX_PLAYERS], bool:ActAntiSpam[MAX_PLAYERS], bool:AntiJackBug[MAX_PLAYERS], SafeTimer;
 
+#if defined IsValidVehicle
+#else
+native IsValidVehicle(vehicleid); // Unlock the hidden native
+#endif
+
 #if defined OnPlayerEnterVehicleACT
 forward OnPlayerEnterVehicleACT(playerid, vehicleid, ispassenger);
 #endif
@@ -110,7 +115,7 @@ public OnGameModeExit()
 stock IsPEnExCar(playerid)
 {
 	new playeranim = GetPlayerAnimationIndex(playerid);
-	
+
 	if (((playeranim == 1041) || (playeranim == 1012)) || (playeranim == 1025) || (playeranim == 1044) ||
 	(playeranim == 1010) || (playeranim == 1011) || (playeranim == 1024 || (playeranim == 1043) || (playeranim == 1009))) return 1;
  	else return 0;
@@ -122,7 +127,7 @@ public SafeReset()
 	new AllVehicles[MAX_VEHICLES];
     for(new i=0; i<MAX_PLAYERS; i++)
 	{
-	if(!IsPlayerConnected(i)) continue;
+		if(!IsPlayerConnected(i)) continue;
  		new gpVehicleID[MAX_PLAYERS];
 		gpVehicleID[i] = GetPlayerVehicleID(i);
     	if(GetPlayerState(i)== PLAYER_STATE_DRIVER && AllVehicles[gpVehicleID[i]] != i )
@@ -133,7 +138,7 @@ public SafeReset()
 		}
 	for(new x=0; x<MAX_VEHICLES; x++)
 	{
-	if(!IsValidVehicle(x)) continue;
+		if(!IsValidVehicle(x)) continue;
 		if(AllVehicles[x] != -1)
 		{
 			if(GetPlayerState(AllVehicles[x]) != PLAYER_STATE_DRIVER) AllVehicles[x] = -1;
@@ -150,7 +155,7 @@ public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 {
 	for(new i=0;i<MAX_PLAYERS;i++)
 	{
-	if(!IsPlayerConnected(i)) continue;
+		if(!IsPlayerConnected(i)) continue;
 		if(!ispassenger && !AntiJackBug[playerid] && i != playerid && GetPlayerVehicleID(i) == vehicleid && GetPlayerState(i) == PLAYER_STATE_DRIVER)
 		{
 			AntiJackBug[playerid]=true;
@@ -183,7 +188,7 @@ public AntiCarTroll(playerid)
 {
 	for(new i = 0; i < MAX_VEHICLES; i++)
 	{
-	if(!IsValidVehicle(x)) continue;
+	if(!IsValidVehicle(i)) continue;
 	if(VehicleTaken[i] && GetPlayerVehicleID(playerid) == i && playerid != VehicleTempOwner[i] && !AntiJackBug[playerid] && !AntiJackBug[VehicleTempOwner[i]] && GetPlayerState(playerid) == PLAYER_STATE_DRIVER && !IsPEnExCar(playerid))
 	{
 	    #if defined ManualUse
