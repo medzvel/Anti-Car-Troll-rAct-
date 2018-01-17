@@ -14,6 +14,12 @@ new ActTimer[MAX_PLAYERS], bool:VehicleTaken[MAX_VEHICLES], VehicleTempOwner[MAX
 native IsValidVehicle(vehicleid); // Unlock the hidden native
 #endif
 
+forward SafeReset();
+forward AntiCarTroll(playerid);
+forward ActReset(playerid);
+forward sActReset(playerid);
+forward ActDelay(playerid);
+
 #if defined OnPlayerEnterVehicleACT
 forward OnPlayerEnterVehicleACT(playerid, vehicleid, ispassenger);
 #endif
@@ -37,6 +43,22 @@ forward OnPlayerDeathACT(playerid, killerid, reason);
 forward OnPlayerStateChangeACT(playerid,newstate,oldstate);
 #endif
 
+#if defined OnGameModeInitACT
+forward OnGameModeInitACT();
+#endif
+
+#if defined OnGameModeExitACT
+forward OnGameModeExitACT();
+#endif
+
+#if defined OnFilterScriptInitACT
+forward OnFilterScriptInitACT();
+#endif
+
+#if defined OnFilterScriptExitACT
+forward OnFilterScriptExitACT();
+#endif
+
 // UN-Comment this part if you want it to ban.
 //#define BanVersion
 
@@ -48,7 +70,6 @@ forward OnPlayerStateChangeACT(playerid,newstate,oldstate);
 
 #if defined FILTERSCRIPT
 
-forward OnFilterScriptInitACT();
 public OnFilterScriptInit()
 {
 		print("		[[--|| rACT V1.0 ||--]]		");
@@ -62,7 +83,6 @@ public OnFilterScriptInit()
   			#endif
 }
 
-forward OnFilterScriptExitACT();
 public OnFilterScriptExit()
 {
 	for(new i=0;i<MAX_PLAYERS;i++)
@@ -80,7 +100,6 @@ public OnFilterScriptExit()
 
 #else
 
-forward OnGameModeInitACT();
 public OnGameModeInit()
 {
 		print("		[[--|| rACT V1.0 ||--]]		");
@@ -94,7 +113,6 @@ public OnGameModeInit()
   			#endif
 }
 
-forward OnGameModeExitACT();
 public OnGameModeExit()
 {
 	for(new i=0;i<MAX_PLAYERS;i++)
@@ -115,13 +133,12 @@ public OnGameModeExit()
 stock IsPEnExCar(playerid)
 {
 	new playeranim = GetPlayerAnimationIndex(playerid);
-
+	
 	if (((playeranim == 1041) || (playeranim == 1012)) || (playeranim == 1025) || (playeranim == 1044) ||
 	(playeranim == 1010) || (playeranim == 1011) || (playeranim == 1024 || (playeranim == 1043) || (playeranim == 1009))) return 1;
  	else return 0;
 }
 
-forward SafeReset();
 public SafeReset()
 {
 	new AllVehicles[MAX_VEHICLES];
@@ -143,10 +160,7 @@ public SafeReset()
 		{
 			if(GetPlayerState(AllVehicles[x]) != PLAYER_STATE_DRIVER) AllVehicles[x] = -1;
 			}
-		if(AllVehicles[x] == -1 && VehicleTaken[x])
-		{
-			VehicleTaken[x]= false;
-			}
+		if(AllVehicles[x] == -1 && VehicleTaken[x]) VehicleTaken[x]= false;
 		}
 	return 1;
 }
@@ -183,7 +197,6 @@ public OnPlayerConnect(playerid)
   			#endif
 }
 
-forward AntiCarTroll(playerid);
 public AntiCarTroll(playerid)
 {
 	for(new i = 0; i < MAX_VEHICLES; i++)
@@ -227,12 +240,11 @@ public AntiCarTroll(playerid)
 
 #if defined ManualUse
 	#if defined OnPlayerCarTroll
-	forward OnPlayerCarTroll(playerid,vehicleid);
+	forward OnPlayerCarTroll(playerid,vehicleid); //Only use if you defined ManualUse
 	#endif
 
 #else
 
-forward ActDelay(playerid);
 public ActDelay(playerid)
 {
 	#if defined BanVersion
@@ -245,7 +257,6 @@ public ActDelay(playerid)
 
 #endif
 
-forward ActReset(playerid);
 public ActReset(playerid)
 {
 	VehicleTaken[pVehicleID[playerid]] = false;
@@ -253,7 +264,6 @@ public ActReset(playerid)
 	return 1;
 }
 
-forward sActReset(playerid);
 public sActReset(playerid)
 {
 	AntiJackBug[playerid]=false;
