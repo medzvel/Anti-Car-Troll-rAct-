@@ -14,9 +14,11 @@ enum ActPData
 {
     bool:ActAntiSpam,
     bool:AntiJackBug,
+    bool:IsDPaused,
     ActTimer,
     ResetTAct,
-    pVehicleID
+    pVehicleID,
+    pPauseTick
 };
 
 enum ActVData
@@ -154,7 +156,7 @@ stock IsPEnExCar(playerid)
 {
 	new playeranim = GetPlayerAnimationIndex(playerid);
 
-	if (((playeranim == 1041) || (playeranim == 1012)) || (playeranim == 1025) || (playeranim == 1044) ||
+	if (((playeranim == 1041) || (playeranim == 1012)) || (playeranim == 1025) || (playeranim == 1044) || (playeranim == 1045) ||
 	(playeranim == 1010) || (playeranim == 1011) || (playeranim == 1024 || (playeranim == 1043) || (playeranim == 1009))) return 1;
  	else return 0;
 }
@@ -209,6 +211,7 @@ public OnPlayerConnect(playerid)
 {
 	ActPlayer[playerid][ActAntiSpam]=false;
 	ActPlayer[playerid][AntiJackBug]=false;
+	
 	ActPlayer[playerid][ActTimer] = SetTimerEx("AntiCarTroll",2500,true,"d",playerid);
 		#if defined OnPlayerConnectACT
 		return OnPlayerConnectACT(playerid);
@@ -219,10 +222,12 @@ public OnPlayerConnect(playerid)
 
 public AntiCarTroll(playerid)
 {
+    if(GetTickCount() > (ActPlayer[playerid][pPauseTick]+4000) && !ActPlayer[playerid][IsDPaused]) ActPlayer[playerid][IsDPaused] = true;
+    else if(ActPlayer[playerid][IsDPaused]) ActPlayer[playerid][IsDPaused] = false;
 	for(new i = 0; i < MAX_VEHICLES; i++)
 	{
 	if(!IsValidVehicle(i)) continue;
-	if(ActVehicle[i][VehicleTaken] && GetPlayerVehicleID(playerid) == i && playerid != ActVehicle[i][VehicleTempOwner] && !ActPlayer[playerid][AntiJackBug] && !ActPlayer[ActVehicle[i][VehicleTempOwner]][AntiJackBug] && GetPlayerState(playerid) == PLAYER_STATE_DRIVER  && !IsPEnExCar(playerid))
+	if(ActVehicle[i][VehicleTaken] && GetPlayerVehicleID(playerid) == i && playerid != ActVehicle[i][VehicleTempOwner] && !ActPlayer[playerid][AntiJackBug] && !ActPlayer[ActVehicle[i][VehicleTempOwner]][AntiJackBug] && GetPlayerState(playerid) == PLAYER_STATE_DRIVER  && !IsPEnExCar(playerid) && !ActPlayer[ActVehicle[i][VehicleTempOwner]][IsDPaused])
 	{
 		#if defined Extreme_Safe
 		if(!ActPlayer[playerid][ActAntiSpam])
@@ -290,6 +295,15 @@ public sActReset(playerid)
 	return 1;
 }
 
+public OnPlayerUpdate(playerid)
+{
+        ActPlayer[playerid][pPauseTick] = GetTickCount();
+		#if defined OnPlayerUpdateACT
+		return OnPlayerUpdateACT(playerid);
+		#else
+		return 1;
+  			#endif
+}
 public OnPlayerStateChange(playerid,newstate,oldstate)
 {
 		if(newstate == PLAYER_STATE_DRIVER)
@@ -341,7 +355,10 @@ public OnPlayerDisconnect(playerid, reason)
 {
     new gpVehicleID;
 	gpVehicleID = GetPlayerVehicleID(playerid);
+	
 	KillTimer(ActPlayer[playerid][ActTimer]);
+	ActPlayer[playerid][IsDPaused] = false;
+	
 	if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 	{
 	    ActVehicle[gpVehicleID][VehicleTaken] =false;
@@ -433,3 +450,11 @@ public OnPlayerDisconnect(playerid, reason)
 #endif
 
 #define OnPlayerEnterVehicle OnPlayerEnterVehicleACT
+
+#if defined _ALS_OnPlayerUpdate
+  #undef OnPlayerUpdate
+#else
+	#define _ALS_OnPlayerUpdate
+#endif
+
+#define OnPlayerUpdate OnPlayerUpdateACT
